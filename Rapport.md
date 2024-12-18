@@ -1,32 +1,37 @@
-# **Rapport**
+# Rapport
 
 ## Sommaire
-1. [Méthode de Monte-Carlo](#i---methode-de-monte-carlo)  
+
+1. [Méthode de Monte-Carlo](#I---Méthode-de-Monte-Carlo)  
    1.1. [Présentation de la méthode de Monte Carlo](#presentation-de-la-methode-de-monte-carlo)  
    1.2. [Exemple : Calcul de π](#exemple-calcul-de-π)  
    1.3. [Génération de points aléatoires](#generation-de-points-aleatoires)  
    1.4. [Estimation de π](#estimation-de-π)
+
 2. [Algorithme de parallélisation](#ii---algorithme-de-parallelisation)  
    2.1. [Représentation de l'algorithme](#representation-de-lalgorithme)  
    2.2. [Analyse de la parallélisation](#analyse-de-la-parallelisation)  
    2.3. [Paradigmes de parallélisation](#paradigmes-de-parallelisation)
+
 3. [Mise en œuvre](#iii---mise-en-œuvre)  
    3.1. [Analyse de Assignement102](#analyse-de-assignement102)  
    3.2. [Analyse de Pi](#analyse-de-pi)
+
 4. [Tests de performance](#iv---tests-de-performance)  
    4.1. [Scalabilité forte](#scalabilite-forte)  
    4.2. [Scalabilité faible](#scalabilite-faible)
+
 5. [Mise en œuvre Mémoire distribuée](#v---mise-en-oeuvre-memoire-distribuee)  
    5.1. [Analyse du Modèle Socket](#analyse-du-modele-socket)  
    5.1.1. [Architecture Client-Serveur](#architecture-client-serveur)  
    5.2. [Composants Clés](#composants-cles)  
    5.2.1. [Partie Client](#partie-client)  
-   5.2.2. [Partie Serveur](#partie-serveur)
-   5.3.0 [Explication des deux `MasterSocket` et `WorkerSocket`](#explication-des-deux-mastersocket-et-workersocket)
-6. [Tests de performance Socket](#VI-Teste-de-performance-Socket)
-   6.1.0 [Analyse de la Scalabilité Forte](#Analyse-de-la-Scalabilité-Forte)
-   6.2.0 [Analyse de la Scalabilité Faible](#Analyse-de-la-Scalabilité-Faible)
+   5.2.2. [Partie Serveur](#partie-serveur)  
+   5.3. [Explication des deux `MasterSocket` et `WorkerSocket`](#explication-des-deux-mastersocket-et-workersocket)
 
+6. [Tests de performance Socket](#vi-test-de-performance-socket)  
+   6.1. [Analyse de la Scalabilité Forte](#analyse-de-la-scalabilite-forte)  
+   6.2. [Analyse de la Scalabilité Faible](#analyse-de-la-scalabilite-faible)
 
 
 ## I - Méthode de Monte-Carlo
@@ -59,8 +64,6 @@ L’estimation de $\pi$ s’obtient en calculant :
 $$
 \pi \approx 4 \times \left(\frac{N_\text{cible}}{N_\text{tot}}\right)
 $$
-
----
 
 ## II - Algorithme de parallélisation
 
