@@ -1,23 +1,11 @@
 package Paradigme.Iteration;
 // Estimate the value of Pi using Monte-Carlo Method, using parallel program
 
+import Paradigme.WriteToFile;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
-
-public class Assignment102 {
-    public static void main(String[] args) {
-        PiMonteCarlo PiVal = new PiMonteCarlo(100000);
-        long startTime = System.currentTimeMillis();
-        double value = PiVal.getPi();
-        long stopTime = System.currentTimeMillis();
-        System.out.println("Approx value:" + value);
-        System.out.println("Difference to exact value of pi: " + (value - Math.PI));
-        System.out.println("Error: " + (value - Math.PI) / Math.PI * 100 + " %");
-        System.out.println("Available processors: " + Runtime.getRuntime().availableProcessors());
-        System.out.println("Time Duration: " + (stopTime - startTime) + "ms");
-    }
-}
 
 class PiMonteCarlo {
     AtomicInteger nAtomSuccess;
@@ -36,13 +24,12 @@ class PiMonteCarlo {
 
     public PiMonteCarlo(int i) {
         this.nAtomSuccess = new AtomicInteger(0);
-        this.nThrows = i;
+        this.nThrows = i;  // totalCount reste constant
         this.value = 0;
     }
 
-    public double getPi() {
-        int nProcessors = Runtime.getRuntime().availableProcessors();
-        ExecutorService executor = Executors.newWorkStealingPool(nProcessors);
+    public double getPi(int numWorkers) {
+        ExecutorService executor = Executors.newFixedThreadPool(numWorkers); // Utilise numWorkers
         for (int i = 1; i <= nThrows; i++) {
             Runnable worker = new MonteCarlo();
             executor.execute(worker);
@@ -50,7 +37,38 @@ class PiMonteCarlo {
         executor.shutdown();
         while (!executor.isTerminated()) {
         }
-        value = 4.0 * nAtomSuccess.get() / nThrows;
+        value = 4.0 * nAtomSuccess.get() / nThrows; // Calcul de Pi avec totalCount constant
         return value;
+    }
+}
+
+public class Assignment102 {
+    public Assignment102() {}
+
+    public static void main(String[] args) {
+        if (args.length < 2) {
+            System.out.println("Usage: java Paradigme.Iteration.Assignment102 <totalCount> <numWorkers>");
+            return;
+        }
+
+        int totalCount = Integer.parseInt(args[0]);
+        int numWorkers = Integer.parseInt(args[1]);
+
+        PiMonteCarlo PiVal = new PiMonteCarlo(totalCount);
+        long startTime = System.currentTimeMillis();
+        double value = PiVal.getPi(numWorkers);
+        long stopTime = System.currentTimeMillis();
+
+        long durationMs = stopTime - startTime;
+        double error = (value - Math.PI) / Math.PI * 100.0;
+
+        System.out.println("Total iterations: " + totalCount);
+        System.out.println("Available processors: " + numWorkers);
+        System.out.println("Time Duration: " + durationMs + "ms");
+        System.out.println("Pi value : " + value);
+        System.out.println("Error: " + error + " %");
+
+        String fileName = "personal_pc_12cores_Assignment102_faible";
+        WriteToFile.write(totalCount, numWorkers, PiVal.nAtomSuccess.get(), durationMs, value, error, fileName);
     }
 }
