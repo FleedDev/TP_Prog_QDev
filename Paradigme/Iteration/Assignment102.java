@@ -24,12 +24,12 @@ class PiMonteCarlo {
 
     public PiMonteCarlo(int i) {
         this.nAtomSuccess = new AtomicInteger(0);
-        this.nThrows = i;  // totalCount reste constant
+        this.nThrows = i;
         this.value = 0;
     }
 
     public double getPi(int numWorkers) {
-        ExecutorService executor = Executors.newFixedThreadPool(numWorkers); // Utilise numWorkers
+        ExecutorService executor = Executors.newFixedThreadPool(numWorkers);
         for (int i = 1; i <= nThrows; i++) {
             Runnable worker = new MonteCarlo();
             executor.execute(worker);
@@ -37,7 +37,7 @@ class PiMonteCarlo {
         executor.shutdown();
         while (!executor.isTerminated()) {
         }
-        value = 4.0 * nAtomSuccess.get() / nThrows; // Calcul de Pi avec totalCount constant
+        value = 4.0 * nAtomSuccess.get() / nThrows;
         return value;
     }
 }

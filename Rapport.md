@@ -22,26 +22,25 @@
    5.2. [Composants Clés](#composants-cles)  
    5.2.1. [Partie Client](#partie-client)  
    5.2.2. [Partie Serveur](#partie-serveur)
-   5.3. [Explication des deux `MasterSocket` et `WorkerSocket`](#explication-des-deux-mastersocket-et-workersocket)
-6. [Tests de performance Socket](#VI-Teste de performance Socket)  
-      6.1. [Analyse de la Scalabilité Forte](#Analyse de la Scalabilité Forte)  
-      6.2. [Analyse de la Scalabilité Faible](#Analyse de la Scalabilité Faible)
-
+   5.3.0 [Explication des deux `MasterSocket` et `WorkerSocket`](#explication-des-deux-mastersocket-et-workersocket)
+6. [Tests de performance Socket](#VI-Teste-de-performance-Socket)
+   6.1.0 [Analyse de la Scalabilité Forte](#Analyse-de-la-Scalabilité-Forte)
+   6.2.0 [Analyse de la Scalabilité Faible](#Analyse-de-la-Scalabilité-Faible)
 
 
 
 ## I - Méthode de Monte-Carlo
 
-### 1.1. Présentation de la méthode de Monte Carlo
+### Présentation de la méthode de Monte Carlo
 La méthode de Monte Carlo est une technique numérique qui résout des problèmes complexes via des simulations aléatoires, en particulier lorsqu'aucune méthode analytique n'est disponible. Elle génère des valeurs aléatoires pour explorer un espace de possibilités et estimer un résultat statistiquement.
 
-### 1.2. Exemple : Calcul de π
+### Exemple : Calcul de π
 La méthode de Monte Carlo peut être utilisée pour estimer la valeur de $\pi$ en considérant un cercle de rayon 1 inscrit dans un carré de côté 1. En générant des points aléatoires à l'intérieur du carré et en comptant ceux qui tombent à l'intérieur du cercle, on peut estimer $\pi$.
 
 #### Image du modèle :
 ![Modèle Monte-Carlo](images/Monte-Carlo.png)
 
-### 1.3. Génération de points aléatoires
+### Génération de points aléatoires
 Les points $P(x_p, y_p)$ sont générés de manière uniforme dans le carré, avec $x_p$ et $y_p$ issus d'une distribution uniforme $U(]0,1[)$. La probabilité qu’un point se trouve dans le cercle est donnée par :
 
 $$
@@ -54,7 +53,7 @@ $$
 \pi \approx 4 \times \frac{N_\text{cible}}{N_\text{tot}}
 $$
 
-### 1.4. Estimation de π
+### Estimation de π
 L’estimation de $\pi$ s’obtient en calculant :
 
 $$
@@ -65,7 +64,7 @@ $$
 
 ## II - Algorithme de parallélisation
 
-### 2.1. Représentation de l'algorithme
+### Représentation de l'algorithme
 Voici une version simplifiée de l'algorithme utilisé pour l'estimation de $\pi$ via Monte Carlo :
 
 ```
@@ -78,7 +77,7 @@ N_cible++;
 fin pour
 ```
 
-### 2.2. Analyse de la parallélisation
+### Analyse de la parallélisation
 L'algorithme peut être parallélisé en identifiant les tâches indépendantes et en synchronisant les sections critiques, comme l'incrémentation de `N_cible`.
 
 #### Tâches principales :
@@ -92,7 +91,7 @@ L'algorithme peut être parallélisé en identifiant les tâches indépendantes 
 #### Ressource critique :
 `N_cible` est une ressource critique qui nécessite une synchronisation pour éviter des conflits lors de l'accès concurrent.
 
-### 2.3. Paradigmes de parallélisation
+### Paradigmes de parallélisation
 
 #### A. Parallélisme de boucle
 Chaque itération de la boucle est indépendante, mais la synchronisation est nécessaire pour l’incrémentation de `N_cible`.
@@ -175,14 +174,8 @@ L'erreur relative en pourcentage.
 Le nombre de processeurs disponibles pour l'exécution parallèle.
 Le temps d'exécution total du calcul, en millisecondes.
 
-Ce programme montre comment la méthode de Monte Carlo peut être utilisée pour estimer,
-Pi, en générant des points aléatoires. L'approche d'**itération parallèle** permet de répartir les calculs sur plusieurs threads,
-accélérant ainsi le processus de calcul.
-
-
 ### Analyse de Pi
 Cette version utilise des **Callables**, des **Futures**, et un **pool de threads** pour répartir les calculs sur plusieurs travailleurs (threads),
-permettant ainsi d'accélérer le processus de simulation. Le programme est écrit en Java.
 
 **Structure générale du code :**
 Le code est composé de trois classes principales :
@@ -412,7 +405,7 @@ if __name__ == "__main__":
 - **Efficacité** : Passer les arguments directement dans les programmes Java évite la modification du code source pour chaque test.
   Voici ton rapport révisé avec la partie **Scalabilité faible** intégrée, suivie d’une synthèse complète :
 
-## **Tests de performance**
+## Tests de performance
 
 Les tests ont été réalisés sur un processeur **Ryzen 5 5600H** (6 cœurs logiques, 12 threads hyper-threadés) en utilisant deux scénarios principaux :
 
@@ -424,7 +417,7 @@ Les tests ont été réalisés sur un processeur **Ryzen 5 5600H** (6 cœurs log
    - 12 workers = 12 000 000 itérations
 
 
-### **Scalabilité Forte**
+### Scalabilité Forte
 
 La répartition des itérations pour un total de **48 000 000** est la suivante :
 
@@ -443,7 +436,7 @@ La charge de travail, répartie entre les workers, varie en fonction du nombre d
 Pour un seul worker, celui-ci traite l'intégralité des 48 000 000 itérations, tandis que pour 12 workers, chaque worker est responsable de 4 000 000 itérations.
 La répartition idéale serait d'avoir une charge de travail équitablement répartie entre les workers.
 
-#### **Analyse des résultats pour Pi**
+#### Analyse des résultats pour Pi
 
 | Workers | Speedup Observé | Efficacité (%) | Speedup Idéal |
 |---------|-----------------|----------------|--------------|
@@ -465,7 +458,7 @@ L’efficacité diminue également à mesure que le nombre de workers augmente.
 Elle est maximale pour un seul worker, mais chute progressivement à environ 43 % pour 12 workers, ce qui montre que l’ajout de workers supplémentaires engendre des coûts d’overhead et des pertes d’efficacité.
 
 
-#### **Analyse des résultats pour Assignment102**
+#### Analyse des résultats pour Assignment102
 
 | numWorkers | speedup_observed | efficiency (%) | speedup_optimal |
 |------------|------------------|----------------|-----------------|
@@ -487,9 +480,9 @@ L’efficacité pour Assignment102 chute rapidement à mesure que le nombre de w
 À 12 workers, l'efficacité atteint seulement 5,91 %, ce qui indique que l'addition de workers entraîne une sous-utilisation des ressources processeur.
 
 
-### **Scalabilité Faible**
+### Scalabilité Faible
 
-#### **Analyse des résultats pour Pi - Méthode Monte-Carlo**
+#### Analyse des résultats pour Pi 
 
 | Workers | Speedup Observé | Efficacité (%) | Speedup Idéal |
 |---------|-----------------|----------------|--------------|
@@ -555,16 +548,16 @@ Ensuite, il serait pertinent de distribuer le calcul sur plusieurs PC, en utilis
 
 ## V - Mise en oeuvre Mémoire distibué
 
-### **Analyse du Modèle Socket**
+### Analyse du Modèle Socket
 
-#### **1. Architecture Client-Serveur **
+#### Architecture Client-Serveur 
 Le schéma étudié illustre une architecture **Client-Serveur** basé sur l’utilisation de **Sockets** pour l’échange de données au sein d’un réseau.
 Cette structure constitue un modèle d’applications distribuées, où plusieurs clients et serveurs interagissent pour accomplir des tâches décentralisées.
 
 ![UMLSocket](images/UMLSocket.png)
-#### **2. Composants Clés**
+#### Composants Clés
 
-#### **2.1 Partie Client**
+#### Partie Client
 Dans un environnement distribué, le **client** représente un node capable de communiquer avec un ou plusieurs serveurs via un **Socket**.
 Il permet d'établir une connexion réseau entre les différents node servers.
 
@@ -574,7 +567,7 @@ Les étapes d’utilisation du socket dans le développement distribué sont les
 - **Envois de requêtes** : Le client transmet des données aux serveurs pour traiter les données.
 - **Réception des réponses** : Les résultats des traitements distribués, une fois calculés par le serveur, sont renvoyés au client.
 
-#### **2.2 Partie Serveur**
+#### Partie Serveur
 Dans un système distribué, le **serveur** traite assure la connexion du client.
 L’utilisation de **ServerSocket** permet au serveur d’écouter les requêtes entrantes sur un **port spécifique**.
 
@@ -588,7 +581,7 @@ Les composants essentiels du serveur :
 3. **Répartition des traitements** : Les requêtes reçues sont traitées par des **workers**.
 4. **Retour des résultats** : Les résultats sont envoyés au client.
 
-#### **2.3 Connexions Ethernet**
+#### Connexions Ethernet
 La communication entre les clients et les serveurs repose sur une liaison **Ethernet**.
 Chaque machine du réseau est identifiée par une **adresse IP**.
 
@@ -596,18 +589,18 @@ Dans le schéma :
 - Le **serveur 1** utilise l’adresse **IP : 192.168.24.193** comme point d’écoute.
 - L’adresse **192.168.24.130** correspond à un autre serveur ou à un nœud secondaire.
 
-### **Explication des deux `MasterSocket` et ` WorkerSocket` **
+### Explication des deux `MasterSocket` et ` WorkerSocket` 
 
 Les classes **`MasterSocket`** et **`WorkerSocket`** illustrent le modèle distribué en utilisant l'architecture vue dans la dernière partie.
 Le **MasterSocket** agit comme un client qui répartit des tâches à plusieurs serveurs (**WorkerSocket**), lesquels renvoient les résultats après avoir effectué un calcul local.
 
-### **1. MasterSocket : Le Client**
+### MasterSocket : Le Client
 La classe **`MasterSocket`** représente le client. Son rôle est de :
 1. **Établir une connexion avec plusieurs Workers**.
 2. **Envoyer une tâche** à chaque Worker.
 3. **Récolter les résultats** des Workers pour effectuer un calcul final.
 
-#### **1.1 Création des connexions avec les Workers**
+#### Création des connexions avec les Workers
 Le **MasterSocket** utilise des **sockets** pour établir des connexions avec les Workers. Les ports sont définis dans un tableau `tab_port` pour permettre plusieurs connexions simultanées.
 
 ```
@@ -620,7 +613,7 @@ writer[i] = new PrintWriter(new BufferedWriter(new OutputStreamWriter(sockets[i]
 - **`new Socket(ip, port)`** : Crée un socket client pour se connecter au Worker.
 - **`BufferedReader`** et **`PrintWriter`** : Permettent respectivement la lecture et l’écriture des messages entre le Master et les Workers.
 
-#### **1.2 Envoi des tâches aux Workers**
+#### Envoi des tâches aux Workers
 Le Master demande à chaque Worker de réaliser un **calcul de Monte Carlo**. Le nombre de lancés est transmis via le socket.
 
 ```
@@ -631,7 +624,7 @@ for (int i = 0; i < numWorkers; i++) {
 ```
 - **`writer[i].println(message)`** : Envoie la tâche sous forme de message à chaque Worker.
 
-#### **1.3 Réception des résultats des Workers**
+#### Réception des résultats des Workers
 Après l’exécution du calcul, chaque Worker renvoie le nombre de points tombant dans le quart de disque.
 
 ```
@@ -643,7 +636,7 @@ for (int i = 0; i < numWorkers; i++) {
 - **`reader[i].readLine()`** : Reçoit le message renvoyé par le Worker.
 - Les résultats sont additionnés pour estimer la valeur de **π**.
 
-### **2. WorkerSocket : Le Serveur**
+### WorkerSocket : Le Serveur
 La classe **`WorkerSocket`** agit comme un **serveur**. Chaque Worker écoute un **port spécifique**, reçoit les instructions du Master, effectue un **calcul local**  et renvoie le résultat.
 
 #### **2.1 Acceptation de la connexion**
@@ -656,7 +649,7 @@ Socket soc = server.accept(); // Acceptation de la connexion avec le Master
 - **`ServerSocket`** permet au Worker d’écouter les requêtes entrantes.
 - **`accept()`** bloque le programme jusqu’à ce qu’une connexion soit établie.
 
-#### **2.2 Réception de la tâche et exécution**
+#### 2.2 Réception de la tâche et exécution
 Le Worker reçoit le nombre de points à lancer pour la méthode de Monte Carlo, effectue le calcul et renvoie le résultat.
 
 ```
@@ -666,16 +659,13 @@ pWrite.println(total); // Envoi du résultat au Master
 ```
 il traite le nombre d'itérations reçu, exécute Monte Carlo et renvoie le résultat obtenu au Master
 
-**Analyse de la Scalabilité Distribuée**
-
+## VI-Teste de performance Socket
 Les tests ont été effectués sur 12 machines identiques, équipées chacune de 8 cœurs hyper-threadés.
 Chaque machine possède 4 cœurs physiques, nous avons limité l’exécution à 4 processus par machine.
-Cela donne un total de 48 processus pour l’ensemble du cluster. 
+Cela donne un total de 48 processus pour l’ensemble du cluster.
 Les temps affichés dans les tableaux suivants sont des moyennes calculées sur plusieurs essais.
 
-
-## **VI-Teste de performance Socket**
-### **Analyse de la Scalabilité Forte**
+### Analyse de la Scalabilité Forte
 
 Les résultats des tests pour la scalabilité forte sont présentés ci-dessous :
 
@@ -697,7 +687,7 @@ Les résultats des tests pour la scalabilité forte sont présentés ci-dessous 
 Les résultats montrent que l’algorithme distribué améliore considérablement la scalabilité forte de l’algorithme Pi.
 Le **speedup** obtenu avec l’approche distribuée est plus proche du speedup idéal que celui de la version en mémoire partagée.
 
-### **Analyse de la Scalabilité Faible**
+### Analyse de la Scalabilité Faible
 
 Les résultats pour la scalabilité faible sont les suivants :
 
