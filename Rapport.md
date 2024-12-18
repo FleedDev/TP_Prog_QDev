@@ -685,7 +685,7 @@ Les résultats des tests pour la scalabilité forte sont présentés ci-dessous 
 | 8        | 192 000 000   | 6 000 000       | 32                    | 206        |
 | 12       | 192 000 000   | 4 000 000       | 48                    | 133        |
 
-![Graphique forte Socket](images/Scale_Distrib_fort.png)
+![Graphique forte Socket](images/Scale_Socket_Forte.png)
 
 Les résultats montrent que l’algorithme distribué améliore considérablement la scalabilité forte de l’algorithme Pi.
 Le **speedup** obtenu avec l’approche distribuée est plus proche du speedup idéal que celui de la version en mémoire partagée.
@@ -707,11 +707,24 @@ Les résultats pour la scalabilité faible sont les suivants :
 | 8        | 128 000 000   | 4 000 000       | 32                    | 140        |
 | 12       | 192 000 000   | 4 000 000       | 48                    | 141        |
 
-![Graphique faible Socket](images/Scale_Distrib_faible.png)
+![Graphique faible Socket](images/Scale_Socket_Faible.png)
 
 L’algorithme distribué améliore aussi la scalabilité faible de l’algorithme Pi. 
 Le speedup est plus proche du speedup idéal comparé à la version en mémoire partagée.
 
+**Convergence de Pi**
+
+L'**effectiveness**, ou efficacité, fait référence à la capacité d'un système à atteindre ses objectifs de manière correcte et pertinente. Autrement dit, cela mesure dans quelle mesure le système produit les résultats attendus tout en minimisant les erreurs. Un système est considéré comme efficace si les résultats qu'il fournit sont non seulement exacts, mais aussi adaptés aux besoins et aux attentes des utilisateurs.
+
+Dans le cadre de la norme ISO 25010, l'**effectiveness** est un critère pour évaluer la qualité d'un logiciel. Elle permet de déterminer si l'algorithme est capable de fonctionner de manière fiable, en produisant des résultats précis et cohérents, tout en répondant aux attentes de ses utilisateurs.
+
+L'erreur de Pi est directement influencée par la taille du problème.
+
+![graphe d'erreur de pi](images/Nuage_Erreur.png)
+
+Sur le graphique ci-dessus, les points bleus représentent l'erreur de chaque itération élevée sur un ordre de log de 10. Les points rouges, quant à eux, représentent les médianes des erreurs des points bleus.
+
+On peut donc constater que la valeur renvoyée par notre algorithme converge progressivement vers la valeur réelle de Pi, et que l'erreur diminue à mesure que le nombre de points utilisés pour le calcul augmente. 
 
 
 

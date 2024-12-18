@@ -31,21 +31,22 @@ def main():
     compile_java()
 
     # total_count = 1000000
-    total_count = 48000000
-    worker_list = [1, 2, 3, 4, 6, 8, 12]
+    total_count = 1000000
+    worker_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,12]
 
 
-    print("\nTest de la scalabilité forte:")
-    for num_workers in worker_list:
-        iterations_per_worker = total_count
-        print(f"\nExécution avec {num_workers} workers (scalabilité forte) - {iterations_per_worker} itérations par worker")
-        run_java(iterations_per_worker, num_workers)
-
-    # print("\nTest de la scalabilité faible:")
+    # print("\nTest de la scalabilité forte:")
     # for num_workers in worker_list:
-    #     total_iterations = total_count * num_workers
-    #     print(f"Scalabilité faible avec {total_iterations} itérations et {num_workers} worker(s)")
-    #     run_java(total_iterations, num_workers)
+    #     iterations_per_worker = total_count
+    #     print(f"\nExécution avec {num_workers} workers (scalabilité forte) - {iterations_per_worker} itérations par worker")
+    #     run_java(iterations_per_worker, num_workers)
+
+    for i in range(10):
+        print("\nTest de la scalabilité faible:")
+        for num_workers in worker_list:
+            total_iterations = total_count * num_workers
+            print(f"Scalabilité faible avec {total_iterations} itérations et {num_workers} worker(s)")
+            run_java(total_iterations, num_workers)
 
 if __name__ == "__main__":
     main()

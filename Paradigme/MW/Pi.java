@@ -62,7 +62,7 @@ public class Pi {
             System.out.println("Error: " + (Math.abs((pi - Math.PI)) / Math.PI));
 
             // Write results to file
-            String fileName = "personal_pc_12cores_pi_forte";
+            String fileName = "personal_pc_12cores_pi_faible";
             WriteToFile.write(totalIterations, numWorkers, totalInCircle, stopTime - startTime, pi, Math.abs((pi - Math.PI)) / Math.PI, fileName);
 
             exec.shutdown();
