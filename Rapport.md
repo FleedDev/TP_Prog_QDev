@@ -16,6 +16,18 @@
 4. [Tests de performance](#iv---tests-de-performance)  
    4.1. [Scalabilité forte](#scalabilite-forte)  
    4.2. [Scalabilité faible](#scalabilite-faible)
+5. [Mise en œuvre Mémoire distribuée](#v---mise-en-oeuvre-memoire-distribuee)  
+   5.1. [Analyse du Modèle Socket](#analyse-du-modele-socket)  
+   5.1.1. [Architecture Client-Serveur](#architecture-client-serveur)  
+   5.2. [Composants Clés](#composants-cles)  
+   5.2.1. [Partie Client](#partie-client)  
+   5.2.2. [Partie Serveur](#partie-serveur)
+   5.3. [Explication des deux `MasterSocket` et `WorkerSocket`](#explication-des-deux-mastersocket-et-workersocket)
+6. [Tests de performance Socket](#VI-Teste de performance Socket)  
+      6.1. [Analyse de la Scalabilité Forte](#Analyse de la Scalabilité Forte)  
+      6.2. [Analyse de la Scalabilité Faible](#Analyse de la Scalabilité Faible)
+
+
 
 
 ## I - Méthode de Monte-Carlo
@@ -540,5 +552,173 @@ En ce qui concerne Assignment102, tant la scalabilité forte que faibles montren
 Ces derniers annulent quasiment tous les avantages du parallélisme, entraînant une dégradation marquée des performances.
 Pour améliorer les performances des applications, deux solutions peuvent être envisagées. Tout d'abord, pour Monte Carlo, il serait judicieux de ne prendre en compte que les 25 % des données qui ne sont pas dans la cible, ce qui réduirait la quantité de données à traiter et améliorerait ainsi les performances.
 Ensuite, il serait pertinent de distribuer le calcul sur plusieurs PC, en utilisant uniquement des cœurs physiques et en évitant les cœurs hyper-threadés, afin de mieux exploiter les ressources matérielles disponibles.
+
+## V - Mise en oeuvre Mémoire distibué
+
+### **Analyse du Modèle Socket**
+
+#### **1. Architecture Client-Serveur **
+Le schéma étudié illustre une architecture **Client-Serveur** basé sur l’utilisation de **Sockets** pour l’échange de données au sein d’un réseau.
+Cette structure constitue un modèle d’applications distribuées, où plusieurs clients et serveurs interagissent pour accomplir des tâches décentralisées.
+
+![UMLSocket](images/UMLSocket.png)
+#### **2. Composants Clés**
+
+#### **2.1 Partie Client**
+Dans un environnement distribué, le **client** représente un node capable de communiquer avec un ou plusieurs serveurs via un **Socket**.
+Il permet d'établir une connexion réseau entre les différents node servers.
+
+Les étapes d’utilisation du socket dans le développement distribué sont les suivantes :
+- **Création du socket** : Le client initialise un socket en précisant l’adresse **IP** et le **port** du serveur.
+- **Connexion** : Le client établit une connexion réseau avec le serveur.
+- **Envois de requêtes** : Le client transmet des données aux serveurs pour traiter les données.
+- **Réception des réponses** : Les résultats des traitements distribués, une fois calculés par le serveur, sont renvoyés au client.
+
+#### **2.2 Partie Serveur**
+Dans un système distribué, le **serveur** traite assure la connexion du client.
+L’utilisation de **ServerSocket** permet au serveur d’écouter les requêtes entrantes sur un **port spécifique**.
+
+Les composants essentiels du serveur :
+- **Node Master** : Le **nœud principal** responsable de coordonner les requêtes, de répartir les traitements entre différents **workers**, et de calculer les résultats finaux.
+- **Server Worker** : Des **threads** ou des instances indépendantes chargées de traiter les requêtes clients en parallèle.
+
+**Étapes du serveur pour le développement distribué** :
+1. **Initialisation** : Le serveur configure un **socket d’écoute** pour recevoir les connexions du client.
+2. **Acceptation des connexions** : Lorsqu’un client se connecte, une nouvelle instance de **socket** est créée.
+3. **Répartition des traitements** : Les requêtes reçues sont traitées par des **workers**.
+4. **Retour des résultats** : Les résultats sont envoyés au client.
+
+#### **2.3 Connexions Ethernet**
+La communication entre les clients et les serveurs repose sur une liaison **Ethernet**.
+Chaque machine du réseau est identifiée par une **adresse IP**.
+
+Dans le schéma :
+- Le **serveur 1** utilise l’adresse **IP : 192.168.24.193** comme point d’écoute.
+- L’adresse **192.168.24.130** correspond à un autre serveur ou à un nœud secondaire.
+
+### **Explication des deux `MasterSocket` et ` WorkerSocket` **
+
+Les classes **`MasterSocket`** et **`WorkerSocket`** illustrent le modèle distribué en utilisant l'architecture vue dans la dernière partie.
+Le **MasterSocket** agit comme un client qui répartit des tâches à plusieurs serveurs (**WorkerSocket**), lesquels renvoient les résultats après avoir effectué un calcul local.
+
+### **1. MasterSocket : Le Client**
+La classe **`MasterSocket`** représente le client. Son rôle est de :
+1. **Établir une connexion avec plusieurs Workers**.
+2. **Envoyer une tâche** à chaque Worker.
+3. **Récolter les résultats** des Workers pour effectuer un calcul final.
+
+#### **1.1 Création des connexions avec les Workers**
+Le **MasterSocket** utilise des **sockets** pour établir des connexions avec les Workers. Les ports sont définis dans un tableau `tab_port` pour permettre plusieurs connexions simultanées.
+
+```
+sockets[i] = new Socket(ip, tab_port[i]); // Connexion à chaque worker via son port
+System.out.println("SOCKET = " + sockets[i]);
+
+reader[i] = new BufferedReader(new InputStreamReader(sockets[i].getInputStream())); 
+writer[i] = new PrintWriter(new BufferedWriter(new OutputStreamWriter(sockets[i].getOutputStream())), true);
+```
+- **`new Socket(ip, port)`** : Crée un socket client pour se connecter au Worker.
+- **`BufferedReader`** et **`PrintWriter`** : Permettent respectivement la lecture et l’écriture des messages entre le Master et les Workers.
+
+#### **1.2 Envoi des tâches aux Workers**
+Le Master demande à chaque Worker de réaliser un **calcul de Monte Carlo**. Le nombre de lancés est transmis via le socket.
+
+```
+String message_to_send = String.valueOf(totalCount); // Nombre de points à traiter
+for (int i = 0; i < numWorkers; i++) {
+    writer[i].println(message_to_send); // Envoi du nombre de points aux Workers
+}
+```
+- **`writer[i].println(message)`** : Envoie la tâche sous forme de message à chaque Worker.
+
+#### **1.3 Réception des résultats des Workers**
+Après l’exécution du calcul, chaque Worker renvoie le nombre de points tombant dans le quart de disque.
+
+```
+for (int i = 0; i < numWorkers; i++) {
+    tab_total_workers[i] = reader[i].readLine(); // Lecture des résultats depuis les Workers
+    total += Long.parseLong(tab_total_workers[i]); // Somme des résultats
+}
+```
+- **`reader[i].readLine()`** : Reçoit le message renvoyé par le Worker.
+- Les résultats sont additionnés pour estimer la valeur de **π**.
+
+### **2. WorkerSocket : Le Serveur**
+La classe **`WorkerSocket`** agit comme un **serveur**. Chaque Worker écoute un **port spécifique**, reçoit les instructions du Master, effectue un **calcul local**  et renvoie le résultat.
+
+#### **2.1 Acceptation de la connexion**
+Le **WorkerSocket** écoute sur un port donné et accepte une connexion entrante depuis le Master.
+
+```java
+ServerSocket server = new ServerSocket(port);
+Socket soc = server.accept(); // Acceptation de la connexion avec le Master
+```
+- **`ServerSocket`** permet au Worker d’écouter les requêtes entrantes.
+- **`accept()`** bloque le programme jusqu’à ce qu’une connexion soit établie.
+
+#### **2.2 Réception de la tâche et exécution**
+Le Worker reçoit le nombre de points à lancer pour la méthode de Monte Carlo, effectue le calcul et renvoie le résultat.
+
+```
+str = bRead.readLine(); // Lecture du message depuis le Master
+long total = monteCarlo(Integer.parseInt(str)); // Calcul Monte Carlo
+pWrite.println(total); // Envoi du résultat au Master
+```
+il traite le nombre d'itérations reçu, exécute Monte Carlo et renvoie le résultat obtenu au Master
+
+**Analyse de la Scalabilité Distribuée**
+
+Les tests ont été effectués sur 12 machines identiques, équipées chacune de 8 cœurs hyper-threadés.
+Chaque machine possède 4 cœurs physiques, nous avons limité l’exécution à 4 processus par machine.
+Cela donne un total de 48 processus pour l’ensemble du cluster. 
+Les temps affichés dans les tableaux suivants sont des moyennes calculées sur plusieurs essais.
+
+
+## **VI-Teste de performance Socket**
+### **Analyse de la Scalabilité Forte**
+
+Les résultats des tests pour la scalabilité forte sont présentés ci-dessous :
+
+| Machines | Points totaux | Points / Worker | Nombre de Processeurs | Temps (ms) |
+|----------|---------------|-----------------|-----------------------|------------|
+| 1        | 192 000 000   | 192 000 000     | 1                     | 5873       |
+| 1        | 192 000 000   | 96 000 000      | 2                     | NC         |
+| 1        | 192 000 000   | 64 000 000      | 3                     | NC         |
+| 1        | 192 000 000   | 48 000 000      | 4                     | 1506       |
+| 2        | 192 000 000   | 24 000 000      | 8                     | 756        |
+| 3        | 192 000 000   | 16 000 000      | 12                    | 508        |
+| 4        | 192 000 000   | 12 000 000      | 16                    | 385        |
+| 6        | 192 000 000   | 8 000 000       | 24                    | 267        |
+| 8        | 192 000 000   | 6 000 000       | 32                    | 206        |
+| 12       | 192 000 000   | 4 000 000       | 48                    | 133        |
+
+![Graphique forte Socket](images/Scale_Distrib_fort.png)
+
+Les résultats montrent que l’algorithme distribué améliore considérablement la scalabilité forte de l’algorithme Pi.
+Le **speedup** obtenu avec l’approche distribuée est plus proche du speedup idéal que celui de la version en mémoire partagée.
+
+### **Analyse de la Scalabilité Faible**
+
+Les résultats pour la scalabilité faible sont les suivants :
+
+| Machines | Points totaux | Points / Worker | Nombre de Processeurs | Temps (ms) |
+|----------|---------------|-----------------|-----------------------|------------|
+| 1        | 4 000 000     | 4 000 000       | 1                     | 129        |
+| 1        | 8 000 000     | 4 000 000       | 2                     | NC         |
+| 1        | 12 000 000    | 4 000 000       | 3                     | NC         |
+| 1        | 16 000 000    | 4 000 000       | 4                     | 140        |
+| 2        | 32 000 000    | 4 000 000       | 8                     | 143        |
+| 3        | 48 000 000    | 4 000 000       | 12                    | 136        |
+| 4        | 64 000 000    | 4 000 000       | 16                    | 134        |
+| 6        | 96 000 000    | 4 000 000       | 24                    | 139        |
+| 8        | 128 000 000   | 4 000 000       | 32                    | 140        |
+| 12       | 192 000 000   | 4 000 000       | 48                    | 141        |
+
+![Graphique faible Socket](images/Scale_Distrib_faible.png)
+
+L’algorithme distribué améliore aussi la scalabilité faible de l’algorithme Pi. 
+Le speedup est plus proche du speedup idéal comparé à la version en mémoire partagée.
+
+
 
 
