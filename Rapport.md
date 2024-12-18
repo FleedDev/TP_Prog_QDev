@@ -443,6 +443,8 @@ La répartition idéale serait d'avoir une charge de travail équitablement rép
 | 8       | 0.51            | 51.00          | 8            |
 | 12      | 0.43            | 43.00          | 12           |
 
+![Scalabilité forte Pi](images/Scale_Pi_Forte.png)
+
 Analyse des résultats :
 Le speedup observé pour Pi est sublinéaire, c’est-à-dire que l'amélioration des performances ralentit à mesure que le nombre de workers augmente.
 Bien que le speedup augmente avec chaque ajout de worker, les gains deviennent de plus en plus petits au fur et à mesure que l'on approche du nombre de cœurs physiques disponibles.
@@ -450,9 +452,6 @@ Cela peut être expliqué par la loi de Amdahl, qui stipule qu'à un certain poi
 L’efficacité diminue également à mesure que le nombre de workers augmente.
 Elle est maximale pour un seul worker, mais chute progressivement à environ 43 % pour 12 workers, ce qui montre que l’ajout de workers supplémentaires engendre des coûts d’overhead et des pertes d’efficacité.
 
-
-
----
 
 #### **Analyse des résultats pour Assignment102**
 
@@ -465,6 +464,8 @@ Elle est maximale pour un seul worker, mais chute progressivement à environ 43 
 | 6          | 0.6754880        | 11.258133      | 6               |
 | 8          | 0.7582078        | 9.477597       | 8               |
 | 12         | 0.7091835        | 5.909863       | 12              |
+
+![Scalabilité forte Assignment102](images/Scale_Assignment_Forte.png)
 
 Analyse des résultats :
 Le speedup observé pour Assignment102 est très faible et même négatif dans une certaine mesure, ce qui signifie qu’ajouter plus de workers ne conduit pas à une amélioration des performances.
@@ -493,6 +494,8 @@ L’efficacité pour Assignment102 chute rapidement à mesure que le nombre de w
 | 11      | 0.51            | 4.60           | 11           |
 | 12      | 0.52            | 4.32           | 12           |
 
+![Scalabilité faible pi](images/Scale_Pi_Faible.png)
+
 Analyse des résultats pour Pi :
 Les résultats pour Pi montrent une scalabilité faible raisonnable.
 Le speedup observé diminue légèrement à mesure que le nombre de workers augmente, ce qui est typique d'une scalabilité faible.
@@ -520,12 +523,15 @@ Cela traduit des coûts supplémentaires en termes de synchronisation et de comm
 | 11     | 0.05           | 0.48           | 1             |
 | 12     | 0.06           | 0.47           | 1             |
 
+![Scalabilité faible Assignment102](images/Scale_Assignment_faible.png)
+
 Analyse des résultats pour Assignment102 :
 Les résultats pour Assignment102 montrent clairement une scalabilité faible et inefficace.
 Le speedup observée chute rapidement et devient très faible à partir de 2 workers, atteignant seulement 0.06 à 12 workers, ce qui indique une très mauvaise performance avec l'ajout de workers.
 L'efficacité diminue également de manière drastique, passant de 100% à 47% dès 2 workers, et tombant à 0.47% à 12 workers.
 Cette dégradation rapide de l'efficacité démontre que Assignment102 ne bénéficie pas du parallélisme et souffre d'un blocage à cause des sémaphores.
 
+#### Conclusion
 Pour le calcul de Pi, on remarque une scalabilité forte sous-linéaire, avec un speedup limité par les coûts de gestion.
 Bien que l'introduction du parallélisme permette d'améliorer les performances, les gains restent relativement faibles en raison des coûts de synchronisation et de la répartition des tâches.
 En revanche, dans le cas de la scalabilité faible, l'efficacité chute de manière significative avec l'augmentation du nombre de workers, ce qui montre une perte d'efficacité à mesure que l'on augmente la parallélisation.
