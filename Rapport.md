@@ -2,36 +2,57 @@
 
 ## Sommaire
 
-1. [Méthode de Monte-Carlo](#I---Méthode-de-Monte-Carlo)  
-   1.1. [Présentation de la méthode de Monte Carlo](#presentation-de-la-methode-de-monte-carlo)  
-   1.2. [Exemple : Calcul de π](#exemple-calcul-de-π)  
-   1.3. [Génération de points aléatoires](#generation-de-points-aleatoires)  
-   1.4. [Estimation de π](#estimation-de-π)
+## I - Méthode de Monte-Carlo
 
-2. [Algorithme de parallélisation](#ii---algorithme-de-parallelisation)  
-   2.1. [Représentation de l'algorithme](#representation-de-lalgorithme)  
-   2.2. [Analyse de la parallélisation](#analyse-de-la-parallelisation)  
-   2.3. [Paradigmes de parallélisation](#paradigmes-de-parallelisation)
+### 1. Présentation de la méthode de Monte-Carlo
+### 2. Exemple : Calcul de π
+### 3. Génération de points aléatoires
+### 4. Estimation de π
 
-3. [Mise en œuvre](#iii---mise-en-œuvre)  
-   3.1. [Analyse de Assignement102](#analyse-de-assignement102)  
-   3.2. [Analyse de Pi](#analyse-de-pi)
+## II - Algorithme de parallélisation
 
-4. [Tests de performance](#iv---tests-de-performance)  
-   4.1. [Scalabilité forte](#scalabilite-forte)  
-   4.2. [Scalabilité faible](#scalabilite-faible)
+### 1. Représentation de l'algorithme
+### 2. Analyse de la parallélisation
+### 3. Paradigmes de parallélisation
 
-5. [Mise en œuvre Mémoire distribuée](#v---mise-en-oeuvre-memoire-distribuee)  
-   5.1. [Analyse du Modèle Socket](#analyse-du-modele-socket)  
-   5.1.1. [Architecture Client-Serveur](#architecture-client-serveur)  
-   5.2. [Composants Clés](#composants-cles)  
-   5.2.1. [Partie Client](#partie-client)  
-   5.2.2. [Partie Serveur](#partie-serveur)  
-   5.3. [Explication des deux `MasterSocket` et `WorkerSocket`](#explication-des-deux-mastersocket-et-workersocket)
+## III - Mise en œuvre
 
-6. [Tests de performance Socket](#vi-test-de-performance-socket)  
-   6.1. [Analyse de la Scalabilité Forte](#analyse-de-la-scalabilite-forte)  
-   6.2. [Analyse de la Scalabilité Faible](#analyse-de-la-scalabilite-faible)
+### 1. Analyse de Assignement102
+### 2. Analyse de Pi
+
+## IV - Qualité de test de performance
+
+### 1. Cas Assignment102
+### 2. Cas Pi
+### 3. Automatisation des tests avec Executor
+### 4. Justification des changements
+
+## V - Tests de performance
+
+### 1. Scalabilité Forte
+### 2. Scalabilité Faible
+### 3. Conclusion
+
+## VI - Mise en œuvre Mémoire distribuée
+
+### 1. Analyse du Modèle Socket
+#### 1.5. Connexions Ethernet
+### 2. Explication des deux `MasterSocket` et `WorkerSocket`
+### 3. MasterSocket : Le Client
+### 4. WorkerSocket : Le Serveur
+
+## VII - Test de performance Socket
+
+### 1. Analyse de la Scalabilité Forte
+### 2. Analyse de la Scalabilité Faible
+### 3. Calculs d'efficacité
+### 4. Convergence de Pi
+
+## VIII - Norme ISO Efficiency and Effectiveness
+
+### 1. Product Quality (qualité du produit)
+### 2. Quality in Use (qualité en utilisation)
+
 
 
 ## I - Méthode de Monte-Carlo
@@ -539,23 +560,25 @@ Le speedup observée chute rapidement et devient très faible à partir de 2 wor
 L'efficacité diminue également de manière drastique, passant de 100% à 47% dès 2 workers, et tombant à 0.47% à 12 workers.
 Cette dégradation rapide de l'efficacité démontre que Assignment102 ne bénéficie pas du parallélisme et souffre d'un blocage à cause des sémaphores.
 
-#### Conclusion
+
+### Conclusion
+
 Pour le calcul de Pi, on remarque une scalabilité forte sous-linéaire, avec un speedup limité par les coûts de gestion.
-Bien que l'introduction du parallélisme permette d'améliorer les performances, les gains restent relativement faibles en raison des coûts de synchronisation et de la répartition des tâches.
+Bien que le parallélisme permette d'améliorer les performances, les gains restent relativement faibles en raison des coûts de synchronisation et de la répartition des tâches.
 En revanche, dans le cas de la scalabilité faible, l'efficacité chute de manière significative avec l'augmentation du nombre de workers, ce qui montre une perte d'efficacité à mesure que l'on augmente la parallélisation.
 
 En ce qui concerne Assignment102, tant la scalabilité forte que faibles montrent une scalabilité négative, principalement à cause des blocages engendrés par l'utilisation des sémaphores.
-Ces derniers annulent quasiment tous les avantages du parallélisme, entraînant une dégradation marquée des performances.
+Elles annulent tous les avantages du parallélisme, entraînant une dégradation des performances.
 Pour améliorer les performances des applications, deux solutions peuvent être envisagées. Tout d'abord, pour Monte Carlo, il serait judicieux de ne prendre en compte que les 25 % des données qui ne sont pas dans la cible, ce qui réduirait la quantité de données à traiter et améliorerait ainsi les performances.
 Ensuite, il serait pertinent de distribuer le calcul sur plusieurs PC, en utilisant uniquement des cœurs physiques et en évitant les cœurs hyper-threadés, afin de mieux exploiter les ressources matérielles disponibles.
 
-## V - Mise en oeuvre Mémoire distibué
+## V - Mise en œuvre Mémoire distibué
 
 ### Analyse du Modèle Socket
 
 #### Architecture Client-Serveur 
 Le schéma étudié illustre une architecture **Client-Serveur** basé sur l’utilisation de **Sockets** pour l’échange de données au sein d’un réseau.
-Cette structure constitue un modèle d’applications distribuées, où plusieurs clients et serveurs interagissent pour accomplir des tâches décentralisées.
+Cette structure constitue un modèle d’applications distribuées, où plusieurs clients et serveurs interagissent pour accomplir des tâches parallèle.
 
 ![UMLSocket](images/UMLSocket.png)
 #### Composants Clés
@@ -642,7 +665,7 @@ for (int i = 0; i < numWorkers; i++) {
 ### WorkerSocket : Le Serveur
 La classe **`WorkerSocket`** agit comme un **serveur**. Chaque Worker écoute un **port spécifique**, reçoit les instructions du Master, effectue un **calcul local**  et renvoie le résultat.
 
-#### **2.1 Acceptation de la connexion**
+#### Acceptation de la connexion
 Le **WorkerSocket** écoute sur un port donné et accepte une connexion entrante depuis le Master.
 
 ```java
@@ -652,7 +675,7 @@ Socket soc = server.accept(); // Acceptation de la connexion avec le Master
 - **`ServerSocket`** permet au Worker d’écouter les requêtes entrantes.
 - **`accept()`** bloque le programme jusqu’à ce qu’une connexion soit établie.
 
-#### 2.2 Réception de la tâche et exécution
+#### Réception de la tâche et exécution
 Le Worker reçoit le nombre de points à lancer pour la méthode de Monte Carlo, effectue le calcul et renvoie le résultat.
 
 ```
@@ -660,7 +683,7 @@ str = bRead.readLine(); // Lecture du message depuis le Master
 long total = monteCarlo(Integer.parseInt(str)); // Calcul Monte Carlo
 pWrite.println(total); // Envoi du résultat au Master
 ```
-il traite le nombre d'itérations reçu, exécute Monte Carlo et renvoie le résultat obtenu au Master
+Traite le nombre d'itérations reçu, exécute Monte Carlo et renvoie le résultat obtenu au Master
 
 ## VI-Teste de performance Socket
 Les tests ont été effectués sur 12 machines identiques, équipées chacune de 8 cœurs hyper-threadés.
@@ -672,18 +695,17 @@ Les temps affichés dans les tableaux suivants sont des moyennes calculées sur 
 
 Les résultats des tests pour la scalabilité forte sont présentés ci-dessous :
 
-| Machines | Points totaux | Points / Worker | Nombre de Processeurs | Temps (ms) |
-|----------|---------------|-----------------|-----------------------|------------|
-| 1        | 192 000 000   | 192 000 000     | 1                     | 5873       |
-| 1        | 192 000 000   | 96 000 000      | 2                     | NC         |
-| 1        | 192 000 000   | 64 000 000      | 3                     | NC         |
-| 1        | 192 000 000   | 48 000 000      | 4                     | 1506       |
-| 2        | 192 000 000   | 24 000 000      | 8                     | 756        |
-| 3        | 192 000 000   | 16 000 000      | 12                    | 508        |
-| 4        | 192 000 000   | 12 000 000      | 16                    | 385        |
-| 6        | 192 000 000   | 8 000 000       | 24                    | 267        |
-| 8        | 192 000 000   | 6 000 000       | 32                    | 206        |
-| 12       | 192 000 000   | 4 000 000       | 48                    | 133        |
+| Machines | Points totaux | Points / Worker | Nombre de Processeurs | Temps (ms) | Speedup Observé | Efficacité (%) |
+|----------|---------------|------------------|-----------------------|------------|-----------------|----------------|
+| 1        | 192 000 000   | 192 000 000      | 1                     | 5873       | 1.000000        | 100.00000      |
+| 1        | 192 000 000   | 48 000 000       | 4                     | 1506       | 3.899734        | 97.49336       |
+| 2        | 192 000 000   | 24 000 000       | 8                     | 756        | 7.768519        | 97.10648       |
+| 3        | 192 000 000   | 16 000 000       | 12                    | 508        | 11.561024       | 96.34186       |
+| 4        | 192 000 000   | 12 000 000       | 16                    | 385        | 15.254545       | 95.34091       |
+| 6        | 192 000 000   | 8 000 000        | 24                    | 267        | 21.996255       | 91.65106       |
+| 8        | 192 000 000   | 6 000 000        | 32                    | 206        | 28.509709       | 89.09284       |
+| 12       | 192 000 000   | 4 000 000        | 48                    | 133        | 44.157895       | 91.99561       |
+
 
 ![Graphique forte Socket](images/Scale_Socket_Forte.png)
 
@@ -694,37 +716,100 @@ Le **speedup** obtenu avec l’approche distribuée est plus proche du speedup i
 
 Les résultats pour la scalabilité faible sont les suivants :
 
-| Machines | Points totaux | Points / Worker | Nombre de Processeurs | Temps (ms) |
-|----------|---------------|-----------------|-----------------------|------------|
-| 1        | 4 000 000     | 4 000 000       | 1                     | 129        |
-| 1        | 8 000 000     | 4 000 000       | 2                     | NC         |
-| 1        | 12 000 000    | 4 000 000       | 3                     | NC         |
-| 1        | 16 000 000    | 4 000 000       | 4                     | 140        |
-| 2        | 32 000 000    | 4 000 000       | 8                     | 143        |
-| 3        | 48 000 000    | 4 000 000       | 12                    | 136        |
-| 4        | 64 000 000    | 4 000 000       | 16                    | 134        |
-| 6        | 96 000 000    | 4 000 000       | 24                    | 139        |
-| 8        | 128 000 000   | 4 000 000       | 32                    | 140        |
-| 12       | 192 000 000   | 4 000 000       | 48                    | 141        |
+| Machines | Points totaux | Points / Worker | Nombre de Processeurs | Temps (ms) | Speedup  | Efficacité (%) |
+|----------|---------------|------------------|-----------------------|------------|----------|----------------|
+| 1        | 4 000 000     | 4 000 000        | 1                     | 129        | 1.0000000 | 100.00000      |
+| 1        | 16 000 000    | 4 000 000        | 4                     | 140        | 1.0000000 | 100.00000      |
+| 2        | 32 000 000    | 4 000 000        | 8                     | 143        | 0.9020979 | 90.20979       |
+| 3        | 48 000 000    | 4 000 000        | 12                    | 136        | 1.0294118 | 102.94118      |
+| 4        | 64 000 000    | 4 000 000        | 16                    | 134        | 0.9626866 | 96.26866       |
+| 6        | 96 000 000    | 4 000 000        | 24                    | 139        | 1.0071942 | 100.71942      |
+| 8        | 128 000 000   | 4 000 000        | 32                    | 140        | 0.9214286 | 92.14286       |
+| 12       | 192 000 000   | 4 000 000        | 48                    | 141        | 0.9929078 | 99.29078       |
 
 ![Graphique faible Socket](images/Scale_Socket_Faible.png)
 
 L’algorithme distribué améliore aussi la scalabilité faible de l’algorithme Pi. 
 Le speedup est plus proche du speedup idéal comparé à la version en mémoire partagée.
 
-**Convergence de Pi**
+### Calculs d'efficacité
 
-L'**effectiveness**, ou efficacité, fait référence à la capacité d'un système à atteindre ses objectifs de manière correcte et pertinente. Autrement dit, cela mesure dans quelle mesure le système produit les résultats attendus tout en minimisant les erreurs. Un système est considéré comme efficace si les résultats qu'il fournit sont non seulement exacts, mais aussi adaptés aux besoins et aux attentes des utilisateurs.
+#### Scalabilité forte
+Le **speedup observé** est défini par :  
+\[
+Speedup_{observé} = \frac{T_1}{T_p}
+\]  
+où \(T_1\) est le temps d'exécution avec un seul processeur, et \(T_p\) le temps avec \(p\) processeurs.
 
-Dans le cadre de la norme ISO 25010, l'**effectiveness** est un critère pour évaluer la qualité d'un logiciel. Elle permet de déterminer si l'algorithme est capable de fonctionner de manière fiable, en produisant des résultats précis et cohérents, tout en répondant aux attentes de ses utilisateurs.
+L’**efficacité** est alors calculée par :  
+\[
+Efficacité = \frac{Speedup_{observé}}{p}
+\]  
+Cela mesure la proportion d’accélération réellement obtenue par rapport au nombre de processeurs ajoutés.
+
+#### Scalabilité faible
+Pour la scalabilité faible, l’**efficacité** est définie comme :  
+\[
+Efficacité = \left(\frac{T_{ref}}{T_{p}}\right) \times 100
+\]  
+où \(T_{ref}\) est le temps de référence pour une machine, et \(T_p\) le temps mesuré avec \(p\) machines.
+
+Le calcul du speedup et de l’efficacité est essentiel pour évaluer les performances des algorithmes parallèles. Ces résultats montrent que l’approche distribuée est plus robuste que les versions en mémoire partagée, permettant d’exploiter pleinement les ressources tout en évitant les problèmes d’accès.
+
+### Convergence de Pi
 
 L'erreur de Pi est directement influencée par la taille du problème.
 
 ![graphe d'erreur de pi](images/Nuage_Erreur.png)
 
-Sur le graphique ci-dessus, les points bleus représentent l'erreur de chaque itération élevée sur un ordre de log de 10. Les points rouges, quant à eux, représentent les médianes des erreurs des points bleus.
+Sur le graphique, les points bleus montrent l'erreur pour chaque itération, calculée en échelle logarithmique. Les points rouges représentent la médiane des erreurs des points bleus.
+On voit que notre algorithme se rapproche peu à peu de la vraie valeur de Pi. Plus on utilise de points pour le calcul, plus l'erreur diminue.
+Comme pour l'efficacité dans le calcul parallèle, cette amélioration dépend directement des efforts fournis. En augmentant le nombre de points ou d'itérations, on obtient une meilleure approximation de Pi, tout comme ajouter des processeurs améliore les performances d'un système.
+Cependant, on remarque encore quelques erreurs très élevées (points bleus en bas du graphique). 
+Cela montre que, même si la tendance générale est bonne, des variations peuvent exister. Ces erreurs sont dues à des limites dans les données ou des approximations.
 
-On peut donc constater que la valeur renvoyée par notre algorithme converge progressivement vers la valeur réelle de Pi, et que l'erreur diminue à mesure que le nombre de points utilisés pour le calcul augmente. 
+## VII - Norme ISO Efficiency and Effectiveness
+
+La norme ISO/IEC 25000 SQuaRE (Software Quality Requirements and Evaluation) propose un cadre structuré pour définir, évaluer et améliorer la qualité des logiciels.
+Elle répond à un besoin de standardisation permettant d’assurer une compréhension commune entre développeurs, gestionnaires de projets et utilisateurs finaux.
+Cette norme vise à uniformiser les critères d’évaluation de la qualité des logiciels, facilitant ainsi la communication entre toutes les parties prenantes.
+De cette manière, il devient possible d’identifier et de corriger les points faibles des logiciels, favorisant une amélioration continue.
+L’adoption de telles normes renforce la confiance des utilisateurs et clients en garantissant la fiabilité des produits tout en réduisant les coûts liés à la maintenance et aux risques d’échecs en production.
+
+### Efficiency and Effectiveness
+
+Dans le cadre de la norme ISO/IEC 25000, les notions d'**efficiency** (efficience) et d'**effectiveness** (effectivité) sont essentielles pour évaluer la qualité d'un logiciel. 
+Ces termes puissent sembler similaires, leur application varie en fonction du point de vue adopté : celui du produit (Quality in Product) ou celui de l'utilisateur (Quality in Use).
+
+#### Product Quality (Qualité du produit)
+
+- **Cible** : Les développeurs et équipes techniques.
+- **Objectif** : Fournir une analyse approfondie des caractéristiques internes du logiciel, telles que le code, l’architecture ou la performance.
+- **Exemple** : Un logiciel bien structuré, respectant les principes de performance, de maintenabilité et d'extensibilité, sera plus facile à déployer, maintenir et faire évoluer.
+- **Efficiency** : Dans le contexte de la qualité du produit, l'efficience fait référence à la **performance du logiciel par rapport à la quantité de ressources** (temps, mémoire, processeur, etc.) utilisées pour accomplir une tâche dans des conditions spécifiées. Il s'agit donc d'évaluer la capacité du produit à accomplir ses tâches de manière **optimisée** en termes de consommation de ressources.
+- **Effectiveness** : L'effectivité, dans le cadre de la qualité du produit, désigne la capacité du logiciel à **atteindre les objectifs fonctionnels** pour lesquels il a été conçu, en produisant des résultats **corrects et précis**. Par exemple, un logiciel de calcul doit produire des résultats exacts pour être considéré comme "effective", indépendamment de l'efficacité des ressources utilisées.
+
+**Performance efficiency** : Il s'agit de l'efficacité du produit mesurée par la **performance** relative à la **quantité de ressources** utilisées dans des conditions spécifiées. Cela peut inclure l'évaluation du temps d'exécution ou de la mémoire utilisée pendant les opérations du logiciel.
+
+#### Quality in Use (Qualité en utilisation)
+
+- **Cible** : Les utilisateurs finaux ou les clients.
+- **Objectif** : Évaluer si le logiciel permet aux utilisateurs d'atteindre les objectifs pour lesquels il a été conçu dans des scénarios d’utilisation réels.
+- **Exemple** : Une application mobile qui permet aux utilisateurs de réserver un billet d’avion rapidement, sans frustration ni erreur, sera perçue comme efficace (effectiveness) et efficiente (efficiency) par l’utilisateur.
+- **Efficiency** : Dans le cadre de la qualité en utilisation, l'efficience fait référence à la **quantité de ressources** (temps, effort, nombre d’interactions, etc.) nécessaires pour accomplir une tâche. Plus un utilisateur peut atteindre son objectif avec moins de ressources (en termes de temps ou d'effort), plus le système est considéré comme efficient.
+- **Effectiveness** : L'effectivité, dans *Quality in Use*, évalue la capacité de l'utilisateur à atteindre ses objectifs ou à accomplir ses tâches avec **précision** et **complétude**. Il s'agit de savoir si l'utilisateur parvient à réaliser ses buts sans erreurs ou difficultés. Par exemple, une application de réservation d'avion est **effective** si elle permet à l'utilisateur de compléter sa réservation avec succès.
+
+### Comparaison entre Product Quality et Quality in Use
+
+Les deux concepts évaluent des aspects similaires d'efficacité et d'efficience, mais à des niveaux d’abstraction différents :
+- **Product Quality** : L'**efficiency** et l'**effectiveness** se concentrent sur l'aspect **technique** et **fonctionnel** du logiciel, c'est-à-dire, sur ses capacités intrinsèques à accomplir les tâches en optimisant l'utilisation des ressources (temps, mémoire, etc.), et à fournir des résultats corrects.
+- **Quality in Use** : L'**efficiency** et l'**effectiveness** concernent l'impact réel du logiciel sur l'expérience de l'utilisateur final. Ici, l'efficacité mesure l'optimisation des ressources de l'utilisateur pour accomplir ses objectifs, et l'effectivité mesure si l'utilisateur peut atteindre ces objectifs avec succès et sans erreurs.
+
+Ainsi, bien que les concepts de **efficiency** et **effectiveness** mesurent des qualités similaires dans les deux contextes, ils se distinguent par leur **perspective** :
+- **Product Quality** évalue la **performance interne du produit** en termes d'utilisation des ressources techniques.
+- **Quality in Use** évalue l'**impact réel sur l'utilisateur**, en mesurant comment il interagit avec le produit et la facilité avec laquelle il atteint ses objectifs.
+
+**Product Quality** et **Quality in Use** mesurent donc des qualités semblables, mais adaptées aux différents **besoins** et **perspectives** des développeurs (aspects internes) et des utilisateurs finaux (aspects pratiques).
 
 
-
+J'ai utilisé ChatGPT pour corriger mes fautes et l'écriture du sommaire, ainsi que pour me générer le code LaTeX pour l'écriture mathématique.

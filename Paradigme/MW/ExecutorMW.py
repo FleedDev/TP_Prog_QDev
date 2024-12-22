@@ -3,7 +3,7 @@ import subprocess
 
 def compile_java():
     java_files = [
-        os.path.join("Paradigme", "MW", "Pi.java"),  # Spécifiez le bon chemin de votre fichier Pi.java
+        os.path.join("Paradigme", "MW", "Pi.java"),
     ]
     for java_file in java_files:
         if os.path.exists(java_file):
@@ -16,7 +16,7 @@ def run_java(total_count, num_workers):
     classpath = "C:/Users/maazn/Desktop/BUT/TP_Prog_QDev/out/production/TP_Prog_QDev"  # Ajustez si nécessaire
 
     java_command = [
-        "java", "-cp", classpath, "Paradigme.MW.Pi",  # Assurez-vous que le chemin de la classe est correct
+        "java", "-cp", classpath, "Paradigme.MW.Pi",
         str(total_count), str(num_workers)
     ]
     process = subprocess.Popen(java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
